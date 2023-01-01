@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class UfoController : MonoBehaviour
 {
@@ -13,22 +14,45 @@ public class UfoController : MonoBehaviour
 	bool isGrounded;
 	//public float firstTap;
 	public Text text;
+	public Text text2;
 	private AudioSource audioSource;
+	public float pts;
+	public float highPts;
+	public string filename;
 
     // Start is called before the first frame update
     void Start()
     {
+    	if ( filename == "" ) filename = "Data/Save/HighScore.mps";
         rb = GetComponent<Rigidbody2D>();
         //firstTap = 0;
         audioSource = GetComponent<AudioSource>();
+        StreamReader streamReader = new StreamReader("Data/Save/HighScore.mps"); // Открываем файл
+		if(streamReader != null)
+		{
+        	while (!streamReader.EndOfStream) // Читаем строки пока они не закончатся
+        	{
+				highPts = System.Convert.ToSingle(streamReader.ReadLine());
+        	}
+        }
     }
  	
     // Update is called once per frame
     void Update()
     {
-       text.text = horizontalSpeed.ToString();
+       text.text = pts.ToString();
+       text2.text = highPts.ToString();
        if (isGrounded)
        {
+       		if(pts > highPts)
+       		{
+       			highPts -= highPts;
+       			highPts += pts;
+       		}
+       		StreamWriter sw = new StreamWriter(filename); // Создаем файл
+        	sw.WriteLine(highPts); // Пишем координаты
+			Debug.Log("Save" + highPts);
+        	sw.Close(); // Закрываем(сохраняем)
        		SceneManager.LoadScene(1);
        }
        if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -57,11 +81,11 @@ public class UfoController : MonoBehaviour
     		SceneManager.LoadScene(0);
     	}
     }
-    private void OnCollisionExit2D(Collision2D collision)
+    private void OnTriggerExit2D(Collider2D collision)
     {
-    	if (collision.gameObject.tag == "Ground")
+    	if (collision.gameObject.tag == "Pointer")
     	{
-    		isGrounded = false;
+    		pts += 1;
     	}
     }
 
