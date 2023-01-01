@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO;
+using System;
+using System.Text;
 
 public class UfoController : MonoBehaviour
 {
@@ -19,21 +21,15 @@ public class UfoController : MonoBehaviour
 	public float pts;
 	public float highPts;
 	public string filename;
+	public string path = @"C:\Flappy UFO Data\HighScore\HighScore.mps";
 
     // Start is called before the first frame update
     void Start()
     {
-    	if ( filename == "" ) filename = "Data/Save/HighScore.mps";
-        rb = GetComponent<Rigidbody2D>();
+    	rb = GetComponent<Rigidbody2D>();
+    	using (FileStream fs = File.Create(path));
         //firstTap = 0;
         audioSource = GetComponent<AudioSource>();
-        StreamReader streamReader = new StreamReader("Data/Save/HighScore.mps"); // Открываем файл
-		if(streamReader != null)
-		{
-        	while (!streamReader.EndOfStream) // Читаем строки пока они не закончатся
-        	{
-				highPts = System.Convert.ToSingle(streamReader.ReadLine());
-        	}
         }
     }
  	
@@ -49,10 +45,6 @@ public class UfoController : MonoBehaviour
        			highPts -= highPts;
        			highPts += pts;
        		}
-       		StreamWriter sw = new StreamWriter(filename); // Создаем файл
-        	sw.WriteLine(highPts); // Пишем координаты
-			Debug.Log("Save" + highPts);
-        	sw.Close(); // Закрываем(сохраняем)
        		SceneManager.LoadScene(1);
        }
        if (Input.GetKeyDown(KeyCode.LeftShift))
