@@ -18,6 +18,10 @@ public class MainMenu : MonoBehaviour
     {
     	SceneManager.LoadScene(3);
     }
+    public void Credits()
+    {
+    	SceneManager.LoadScene(4);
+    }
     public void Exit()
     {
     	Application.Quit();
