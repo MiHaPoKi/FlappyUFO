@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using System.IO;
 using System;
 using System.Text;
+using System.Threading.Tasks;
+using System.Linq;
 
 public class UfoController : MonoBehaviour
 {
@@ -13,40 +15,57 @@ public class UfoController : MonoBehaviour
 	public float verticalImpulse;
 	float speedX;
 	Rigidbody2D rb;
-	bool isGrounded;
 	//public float firstTap;
 	public Text text;
 	public Text text2;
 	private AudioSource audioSource;
-	public float pts;
-	public float highPts;
-	public string filename;
-	public string path = @"C:\Flappy UFO Data\HighScore\HighScore.mps";
+	public int pts;
+	public int highPts;
+	bool isGrounded;
+	string hptsConv;
+	//public string filename;
+	//public string path = @"C:\Flappy UFO Data\HighScore\HighScore.txt";
 
     // Start is called before the first frame update
     void Start()
     {
     	rb = GetComponent<Rigidbody2D>();
-    	using (FileStream fs = File.Create(path));
         //firstTap = 0;
-        audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>(); 
+        if(!Directory.Exists("UFO Data"))
+        {
+            Directory.CreateDirectory("UFO Data");
+        }                    
+        if(!File.Exists("UFO Data/HighScore.txt"))
+        {
+            File.Create("UFO Data/HighScore.txt");
         }
+        hptsConv = File.ReadAllText("UFO Data/HighScore.txt");
+        //Debug.Log("readed" + hptsConv);
+        highPts = int.Parse(hptsConv);
+        //Debug.Log("Read" + highPts);
+         
     }
  	
     // Update is called once per frame
     void Update()
     {
        text.text = pts.ToString();
-       text2.text = highPts.ToString();
-       if (isGrounded)
+       text2.text = hptsConv;
+	   if (isGrounded)
        {
+       		//Debug.Log("Hi" + highPts);
+       		//Debug.Log("Pts" + pts);
        		if(pts > highPts)
        		{
-       			highPts -= highPts;
-       			highPts += pts;
+       			//Debug.Log("Hi" + hptsConv);
+       			//Debug.Log("Pts" + pts);
+     			File.WriteAllText("UFO Data/HighScore.txt", pts.ToString());
        		}
+       		//string hptsConv = highPts.ToString();
+     		//File.WriteAllTextAsync("UFO Data/HighScore.txt", hptsConv);
        		SceneManager.LoadScene(1);
-       }
+       } 
        if (Input.GetKeyDown(KeyCode.LeftShift))
        {
 			
@@ -80,5 +99,5 @@ public class UfoController : MonoBehaviour
     		pts += 1;
     	}
     }
-
 }
+
